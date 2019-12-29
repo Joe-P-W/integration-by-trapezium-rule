@@ -1,14 +1,19 @@
+from numba import njit
 import time
+from concurrent.futures import ThreadPoolExecutor
 
 
+@njit()
 def equation(x):
     return x**2+1
 
 
+@njit()
 def trapz_area(top, bottom, height):
     return ((top+bottom)/2)*height
 
 
+@njit()
 def integrate(equation, start, end,
               accuracy: float = 0.0001) -> float:
     """
@@ -36,7 +41,8 @@ def integrate(equation, start, end,
 
     return area
 
-
+integrate(equation, 0.0, 1)
 t1 = time.time()
-print(integrate(equation, 0.0, 1000.0))
+with ThreadPoolExecutor(8) as ex:
+    print(ex.map(integrate, (equation, 0.0, 1000.0)))
 print(time.time() - t1)
